@@ -4,51 +4,53 @@
 ## SET OF QUESTIONS
 
 1. Summarize the project, what it is, what its goals are, and why it exists.
+- Xen provide level 1 hypervisor, which means provides full virtualization. But at the same time, xen adopt paravirtualization (pv) technology, so each domain use physical resources thorouth dom0.(a)
+
+- Xen exists to provide resource efficient and robust virtualization. Xen is for the people that want to be able to create virtual machines on demand and have them all share the same hardware. Xen aims to minimize the overhead from this and make the user experience virtually identical to the experience on a true machine. Most implementations of virtualization are for the use case where the user uses both the host OS and the guest OSes frequently. Contrary to this, Xen is rarely directly used by the user and the guest OSes are the focus. (g)
+
+- The Xen project allows efficient virtualization by providing a management VM (dom0). In addition, Xen provides paravirtualization for legacy systems that don’t have VM hardware capabilities. (k)
+
+
 2. What is the target domain of the system? Where is it valuable, and where is it not a good fit? These are all implemented in an engineering domain, thus are the product of trade-offs. No system solves all problems (despite the claims of marketing material).
+- Xen are used at wide internet hosting services. Xen provides type 1 hypervisor, which can provide better security. I guess this is the reason that xen could be used in automotive industries. On the other hand, xen needs some overhead for executing.(a)
+- This is valuable to large server farms, research institutions and private companies that utilize frequent virtual machines. Amazon has long relied on Xen for virtualization in EC2 instances. xen is hugely valuable when the virtualized systems are not cooperative. The original paper for Xen titled Xen and the Art of Virtualization uses the terminology "when resources are oversubscribed, or users uncooperative". However, if the user is not going to be deploying more than 100 virtual OSes on one machine and instead looks to use 1 or 2, then more traditional approaches or process level isolation would be better(g)
+
+
 3. What are the "modules" of the system (see early lectures), and how do they relate? Where are isolation boundaries present? How do the modules communicate with each other? What performance implications does this structure have?
+- The characteristics of xen is dom0, which is default virtual machine, and other virtual machine, domU. Xen is usually para-virtualization (pv), then, each domU use physical resources via dom0. This system can improve security but need some computation cost.(a)
+
+- In Xen the hypervisor is the only component that has full privileges, it is designed to be small and limited as possible. The hypervisor relies on a trusted guest OS to provide hardware drivers, a kernel, and a userland. This privileged domain is uniquely distinguished as the domain that the hypervisor allows to access devices and perform control functions. By doing this, the Xen developers ensure that the hypervisor remains small and maintainable and that it occupies as little memory as possible.(b)
+- It is from dom0 that the user administers Xen, from dom0 the user can create,destroy other domains. Network and storage devices can also be manipulated. dom0 also has privileged access to hardware and it uses it to expose virtualized hardware to other virtual machines. (b)
+- There are two mechanisms for Communication, hypercalls and event notifications. Calls from domains to Xen are done using hypercalls and notifications from Xen to domains are done using an asynchronous event mechanism. Pending events raised by Xen are handled by each domain by maintaining a bit mask. The callback handler for those events are responsible for resetting the set of pending events. A domain can also defer event handling  by setting a Xen-readable software flag.(b)
+
+
 4. What are the core abstractions that the system aims to provide. How and why do they depart from other systems?
+- In my understanding, basically, xen abstract most of computer resources, including memory and cpu. Each domain on virtual machine can use these resources via dom0.(a)
+- Xen aims to provide strong isolation that is performative. They use "paravirtualization" to do this. This is where virtual machine abstractions that are very similar to the actual hardware are used. The OS is required to be modified a bit still under this approach. It is important to note that this provides a large performance improvement over full virtualization yet still allows for the isolation. Xen also allows binaries to go unmodified for compatibility. Paravirtualization also allows Xen to expose real machine addresses to the guest OSes, notably supporting superpages and page coloring. (g)
+- domU virtual machines can assume safety via hardware-based isolation. (k)
+
+
 5. In what conditions is the performance of the system "good" and in which is it "bad"? How does its performance compare to a Linux baseline (this discussion can be quantitative or qualitative)?
+- In my understanding, the core technology of xen is para-virtualization and hardware virtual machines.(a)
+- Linux VM (dom0) is utilized to provide management services throughout the machines execution. Hardware virtualization (when not doing paravirutalization) via the machine architecture is used. These are abstracted to the VMs in order to seem like they are running as a regular server. This is especially useful for cloud-based systems (k)
+
 6. What are the core technologies involved, and how are they composed?
+- In general, dom0 is the “refmon” where most operations are required to go through. This VM has the utmost privilege on the system, and is the first to boot up. (k)
+
 7. What are the security properties of the system? How does it adhere to the principles for secure system design? What is the reference monitor in the system, and how does it provide complete mediation, tamperproof-ness, and how does it argue trustworthiness?
+- By thorough control via dom0, xen can monitor every activity. Also, since each domain is separated, isolated well.(a)
+- One recent optimization is the dom0-less static partitioning to avoid the complexity of running an extra management virtual machine after bootup. (k)
+- Also, if dom0 is used, there is the option for xen PCI passthrough, which gives the VM guest more rights - instead of sending requests to the event channel via dom0, the privileged domU can bypass the access the hardware directly (much faster but less secure (k)
+
 8. What optimizations exist in the system? What are the "key operations" that the system treats as a fast-path that deserve optimization? How does it go about optimizing them?
+- Actually, I do not understand the optimization mechanism of them. But scheduling function is in virtual machine, I guess, there are some scheduling system like capability based operating systems.(a)
+
 9. Subjective: What do you like, and what don't you like about the system? What could be done better were you to re-design it?
+- I feel it is a very good architecture for cyber security. Dom0 and domU relationship looks good for security issues. As of now, I do not know the details of technology, so I do not have any opinion to rebuild the technology.(a)
 
-## AKINORI
-1. summrize
-- Xen provide level 1 hypervisor, which means provides full virtualization. But at the same time, xen adopt paravirtualization (pv) technology, so each domain use physical resources thorouth dom0.
-
-2. Target domain, strength, and weakness
-- Xen are used at wide internet hosting services. Xen provides type 1 hypervisor, which can provide better security. I guess this is the reason that xen could be used in automotive industries. On the other hand, xen needs some overhead for executing.
-
-3. Modules and isolation
-- The characteristics of xen is dom0, which is default virtual machine, and other virtual machine, domU. Xen is usually para-virtualization (pv), then, each domU use physical resources via dom0. This system can improve security but need some computation cost.
-
-4. core abstraction
-- In my understanding, basically, xen abstract most of computer resources, including memory and cpu. Each domain on virtual machine can use these resources via dom0.
-
-5. core technology and how to be coordinated.
-- In my understanding, the core technology of xen is para-virtualization and hardware virtual machines.
-
-6. security
-- By thorough control via dom0, xen can monitor every activity. Also, since each domain is separated, isolated well.
-
-7. optimizations
-- Actually, I do not understand the optimization mechanism of them. But scheduling function is in virtual machine, I guess, there are some scheduling system like capability based operating systems.
-
-8. what i like
-- I feel it is a very good architecture for cyber security. Dom0 and domU relationship looks good for security issues. As of now, I do not know the details of technology, so I do not have any opinion to rebuild the technology.
-
-## BIYAS
-
-3) Modules and Isolation and  Communication -
-- In Xen the hypervisor is the only component that has full privileges, it is designed to be small and limited as possible. The hypervisor relies on a trusted guest OS to provide hardware drivers, a kernel, and a userland. This privileged domain is uniquely distinguished as the domain that the hypervisor allows to access devices and perform control functions. By doing this, the Xen developers ensure that the hypervisor remains small and maintainable and that it occupies as little memory as possible.
-
-- It is from dom0 that the user administers Xen, from dom0 the user can create,destroy other domains. Network and storage devices can also be manipulated. dom0 also has privileged access to hardware and it uses it to expose virtualized hardware to other virtual machines. 
-
-- There are two mechanisms for Communication, hypercalls and event notifications. Calls from domains to Xen are done using hypercalls and notifications from Xen to domains are done using an asynchronous event mechanism. Pending events raised by Xen are handled by each domain by maintaining a bit mask. The callback handler for those events are responsible for resetting the set of pending events. A domain can also defer event handling  by setting a Xen-readable software flag.
  
 
-## EMIL
+### EMIL
 
 The Project Hypervisor serves as the basis for various types of virtualization, including commercial, desktop, server, IaaS and embedded products, as well as cloud solutions. It is a type-1 or baremetal hypervisor, which means it operates below even the host OS itself, right on top of the bare hardware. 
 
@@ -71,49 +73,11 @@ Compared to others on the market, Xen provides less management tools and you sho
 
 
 
-## GUS
-1) Summarize the project, what it is, what its goals are, and why it exists.
-
-- Xen exists to provide resource efficient and robust virtualization. Xen is for the people that want to be able to create virtual machines on demand and have them all share the same hardware. Xen aims to minimize the overhead from this and make the user experience virtually identical to the experience on a true machine. Most implementations of virtualization are for the use case where the user uses both the host OS and the guest OSes frequently. Contrary to this, Xen is rarely directly used by the user and the guest OSes are the focus.
-
-2) What is the target domain of the system? Where is it valuable, and where is it not a good fit? These are all implemented in an engineering domain, thus are the product of trade-offs. No system solves all problems (despite the claims of marketing material).
-
-- This is valuable to large server farms, research institutions and private companies that utilize frequent virtual machines. Amazon has long relied on Xen for virtualization in EC2 instances. xen is hugely valuable when the virtualized systems are not cooperative. The original paper for Xen titled Xen and the Art of Virtualization uses the terminology "when resources are oversubscribed, or users uncooperative". However, if the user is not going to be deploying more than 100 virtual OSes on one machine and instead looks to use 1 or 2, then more traditional approaches or process level isolation would be better
-
-
-4) What are the core abstractions that the system aims to provide. How and why do they depart from other systems?
-
-- Xen aims to provide strong isolation that is performative. They use "paravirtualization" to do this. This is where virtual machine abstractions that are very similar to the actual hardware are used. The OS is required to be modified a bit still under this approach. It is important to note that this provides a large performance improvement over full virtualization yet still allows for the isolation. Xen also allows binaries to go unmodified for compatibility. Paravirtualization also allows Xen to expose real machine addresses to the guest OSes, notably supporting superpages and page coloring.
-
-
-## KEVIN
+### KEVIN
 ### Useful articles:
 - https://www.serverwatch.com/server-news/hypervisor-face-off-kvm-vs-xen-vs-vmware/
 - http://www-archive.xenproject.org/files/Marketing/HowDoesXenWork.pdf
 - https://www.linux.com/news/kvm-or-xen-choosing-virtualization-platform/
-
-1. Summarize the project, what it is, what its goals are, and why it exists.
-- The Xen project allows efficient virtualization by providing a management VM (dom0). In addition, Xen provides paravirtualization for legacy systems that don’t have VM hardware capabilities. 
-
-2. What is the target domain of the system? Where is it valuable, and where is it not a good fit? These are all implemented in an engineering domain, thus are the product of trade-offs. No system solves all problems (despite the claims of marketing material).
-
-3. What are the "modules" of the system (see early lectures), and how do they relate? Where are isolation boundaries present? How do the modules communicate with each other? What performance implications does this structure have?
-
-4. What are the core abstractions that the system aims to provide. How and why do they depart from other systems?
-- domU virtual machines can assume safety via hardware-based isolation. 
-
-5. What are the core technologies involved, and how are they composed?
-- Linux VM (dom0) is utilized to provide management services throughout the machines execution. Hardware virtualization (when not doing paravirutalization) via the machine architecture is used. These are abstracted to the VMs in order to seem like they are running as a regular server. This is especially useful for cloud-based systems 
-
-6. What are the security properties of the system? How does it adhere to the principles for secure system design? What is the reference monitor in the system, and how does it provide complete mediation, tamperproof-ness, and how does it argue trustworthiness?
-- In general, dom0 is the “refmon” where most operations are required to go through. This VM has the utmost privilege on the system, and is the first to boot up. 
-
-7. What optimizations exist in the system? What are the "key operations" that the system treats as a fast-path that deserve optimization? How does it go about optimizing them?
-- One recent optimization is the dom0-less static partitioning to avoid the complexity of running an extra management virtual machine after bootup. 
-- Also, if dom0 is used, there is the option for xen PCI passthrough, which gives the VM guest more rights - instead of sending requests to the event channel via dom0, the privileged domU can bypass the access the hardware directly (much faster but less secure
-
-
-
 
 ## VEDANT
 
