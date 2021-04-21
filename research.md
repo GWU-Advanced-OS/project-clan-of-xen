@@ -38,6 +38,7 @@ Research.md
 
 
 ![NIC scaling](images/performance_art-of-virtualization_NICs.png)
+
 Here we can see that xen scales with Network Interface cards for a while, however the differences show eventually
 
 ![Relative Performance](images/performance_art-ov-virtulaization_relative-perfomrace.png)
@@ -48,13 +49,12 @@ Compared to baseline, xen never is better. However, xen beats other virtualizati
 
 ![Apache DomainU](https://image.slidesharecdn.com/xen1-131113004608-phpapp01/95/xen-and-the-art-of-virtualization-42-638.jpg?cb=1384303592)
 
-Here, we can see that the xen matches perfirmance well after adding more than one instance. This makes some intuitive sense, since Xen is designed for use cases where many more than a single vm is running
+Here, we can see that the xen matches performance well after adding more than one instance. This makes some intuitive sense, since Xen is designed for use cases where many more than a single vm is running
 
 ![PTS](images/performance_kvm-xen_pts.png)
 ![Performance Evaluation of Xen, KVM, and Proxmox Hypervisors](images/performance_xen-kvm-proxmox_fig2.jpg)
 
 This diagram shows a good representation of when KVM yielded better results vs when Xen did. Proxmox was also a part of the comparison. This comes from the paper Performance Evaluation of Xen, KVM, and Proxmox Hypervisors. This shows that Xen is better with filesystem performance and application performance. And those two results make sense since that is the motivation behind Xen. Xen has more direct access to devices, and enforces isolation. Further, xen is targeted at use cases that utilize many vms. In some papers they even state that they target 100 vms and if fewer are needed there might be better solutions elsewhere. Each of the performance tests in this paper do not approach that many. 
-
 
 ***What are the "modules" of the system (see early lectures), and how do they relate? Where are isolation boundaries present? How do the modules communicate with each other? What performance implications does this structure have?***
 
@@ -62,7 +62,9 @@ This diagram shows a good representation of when KVM yielded better results vs w
 
 In the diagram above, we can see that the high level modules are the hypervisor (xen), the Guest VM that acts as control plane software, and the guest vms that are labeled user software. The "user software" vms are the vms that most users would access. For example, the "user" vm could be an AWS EC2 instance. These are the instances that have the strongest isolation between each other.
 
+Essential modules are the mentioned Domains. Domain0 is a relatively novel solution to permissioning and providing direct access. Essentially, Dom0 acts as a server to the User Domains (DomU). All DomU machines receive a Xen Virtual firmware which modifies the kernel to access Dom0 instead of the physical hardware.
 
+Isolation is preserved through this indirect access. Although having a domain to manage resource allocation adds overhead since this management is active, the performance hit is relatively small especially when scaling up.
 
 **Emil**  
 What are the core technologies involved, and how are they composed?
