@@ -35,6 +35,8 @@ Research.md
 
 **Gus**  
 ***In what conditions is the performance of the system "good" and in which is it "bad"? How does its performance compare to a Linux baseline (this discussion can be quantitative or qualitative)?***
+
+
 ![NIC scaling](images/performance_art-of-virtualization_NICs.png)
 Here we can see that xen scales with Network Interface cards for a while, however the differences show eventually
 
