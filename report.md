@@ -217,7 +217,7 @@ Xen allows for schedular optimizations to work best with the workload. By defaul
 The paper discussing the XenTune monitoring tool did make it obvious that choosing the right parameters can be difficult and for most users lead to worse performance just like the authors of the XenTune paper had to face.
 
 
-- Virtual address translation
+- Virtual address translation  
 All hypervisors introduce an abstraction which acts as pseudo memory. This abstraction is P2M which translates guest page tables to machine page tables. In Full virtualization this P2M is managed inside hypervisor by something called shadow page tables. The problem with shadow page tables is that the hypervisor has to synchronize any changes that happen in the guest page table because the guest VM does not know about the existence of shadow page tables. This is slow.
 Xen provides a novel idea called Direct Paging which allows it to map virtual address directly to underlying machine address space and the virtual to physical mapping is directly managed by the guest VM. In order to make sure that guest VM
 does not make any rogue changes, all page table updates are passed to Xen for validation via hypercall. 
@@ -255,7 +255,8 @@ Xen uses round robin algorithm to process competing disk requests and then it's 
 
 - AWS is juggling between Xen and other hypervisors for different instance types, and currently, they are the only big services provider that still use Xen.
 - The reason why they are using KVM is to cut some costs for development and support and to overcome scalability and performance issues.
-- After using Xen over a decade, AWS is challenged to transfer everything to KVM, but they are still not completely abandoning Xen as Xen is way ahead in functionaity in comparison to KVM currently but it is expected that KVM will catch up with Xen very soon.
+<!-- - Hardware has come a long way to support virtualization and  -->
+- After using Xen over a decade, AWS is challenged to transfer everything to KVM, but they are still not completely abandoning Xen as Xen is way ahead in functionality in comparison to KVM currently but it is expected that KVM will catch up with Xen very soon.
 - They are still working on many details that need to be perfected first. The AWS tools for cloud management must go towards new direction and evolve into multi-hypervisor.
 - The new hypervisor will likely fit well with AWS hardware such as the custom Intel Skylake Xeons and will provide optimized security features and performance, but the final consumers will likely not notice any big difference besides a decent decrease in pricing. 
 

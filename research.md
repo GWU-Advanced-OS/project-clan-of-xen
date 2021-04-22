@@ -199,7 +199,7 @@ Xen implements zero copy networking where it requires Guest OS to exchange unuse
 - Scheduler   
 Xen uses Borrowed Virtual Time scheduling algorithm. BVT provides low-latency dispatch by using virtual-time warping, a mechanism which temporarily violates ‘ideal’ fair sharing to favor recently-woken domains. 
 
-- Virtual address translation  
+- Virtual address translation    
 Xen does not require the use of shadow page tables which is required in full virtualization.
 Xen maps guest OS page tables directly with the memory and then make it Read only. All page table updates are passed to Xen for validation via hypercall. A small optimization here exists where guest OS can queue multiple updates locally before making a hypercall. Because most of the times guest OS will be reading from page tables, it has very little performance overhead.   
 
