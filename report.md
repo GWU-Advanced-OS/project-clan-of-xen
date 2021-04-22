@@ -251,6 +251,13 @@ struct multicall_entry {
 Reordering of requests happen at two places. Once inside the domain by the disk scheduling algorithm inside it before queueing them on the ring and the second time inside Xen as it has more knowledge about the actual disk layout. So responses from Xen can also be out of order as we have already mentioned above when discussing the ring data structure. Domains can also explicitly pass down reorder barriers to prevent reordering if order is necessary to maintain higher level semantics.
 Xen uses round robin algorithm to process competing disk requests and then it's passed to a elevator scheduler before reaching the disk hardware.
 
+## AWS migrating from Xen to KVM
+
+- AWS is juggling between Xen and other hypervisors for different instance types, and currently, they are the only big services provider that still use Xen.
+- The reason why they are using KVM is to cut some costs for development and support and to overcome scalability and performance issues.
+- After using Xen over a decade, AWS is challenged to transfer everything to KVM, but they are still not completely abandoning Xen as Xen is way ahead in functionaity in comparison to KVM currently but it is expected that KVM will catch up with Xen very soon.
+- They are still working on many details that need to be perfected first. The AWS tools for cloud management must go towards new direction and evolve into multi-hypervisor.
+- The new hypervisor will likely fit well with AWS hardware such as the custom Intel Skylake Xeons and will provide optimized security features and performance, but the final consumers will likely not notice any big difference besides a decent decrease in pricing. 
 
 ## Subjective Discussion
 ### Positives
