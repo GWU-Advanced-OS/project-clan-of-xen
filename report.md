@@ -202,6 +202,7 @@ We can breakdown the optimizations in the system by components.
 Events are how Xen notifies the VMs and event channel is a primitive provided by Xen for event notifications. Events are stored as bitmap which is shared between VMs and Xen. Optimizations such as N-Level search path and per-cpu mask are used to speed up the search process. So far Xen supports 2-level event channel and 3-level is planned for their latest 4.3 version.
 2-level event channel is where the first level is pending event bits which basically means what kind of event is pending and the second level is a bitset of pending events themselves.
 
+<img align="right" src="images/Screenshot%20(25).png">
 - Buffered IO Ring  
 Ring data structure is an implementation of queue data structure and uses pointers for Enqueue and Dequeue. In Xen, guest VMs attach a unique Id for each request that goes into the ring and Xen after processing the request reproduces the id when placing it on the ring for consumption by guest VMs. This optimization allows Xen to reorder requests in order of priority or scheduling
 considerations which is useful when dealing with disk requests.
@@ -211,7 +212,7 @@ Xen. This allows each domain to trade-off latency and throughput requirements.
 - Network   
 Xen implements zero copy networking where it requires Guest OS to exchange unused page frame for each packet it receives to avoid copying the packet between Xen and guest OS.
 
-- Scheduler
+- Scheduler  
 Xen allows for schedular optimizations to work best with the workload. By default the time slice preemption is set to 30 ms but that can be modified and set to much lower value by setting ```tslice_ms ``` but in case if there is a situation where there is heavy workload and context switches slows down the workflow then context switch can be rate limited as well.  Xen uses Credit scheduling algorithm. It's a weighted proportional fair share algorithm. Each physical cpu has a run queue for virtual cpu's that are placed on it based on their priority.
 The paper discussing the XenTune monitoring tool did make it obvious that choosing the right parameters can be difficult and for most users lead to worse performance just like the authors of the XenTune paper had to face.
 
@@ -286,7 +287,8 @@ Xen uses round robin algorithm to process competing disk requests and then it's 
     - Xen security architecture and system modules research
     - Security part of the final report
 - Biyas
-    - System optimizations and modules research, as well as hypotheses
+    - System optimizations and modules research
+    - optimization part of the final report
 - Emil
     - System modules hypotheses, and core technologies
 - Gus
