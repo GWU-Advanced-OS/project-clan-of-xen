@@ -6,7 +6,7 @@
 - report.md: Final report
 - presentation: Includes relevant files for the presentation
 
-# Authors
+## Authors
 
 1. Akinori Kahata
 2. Biyas Basak
