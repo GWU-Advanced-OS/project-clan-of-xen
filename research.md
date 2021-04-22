@@ -145,7 +145,10 @@ Responsibilities of the hypervisor include memory management and CPU scheduling 
 The dom0 domain is typically a version of Linux or BSD. User domains may either be traditional operating systems, such as Microsoft Windows under which privileged instructions are provided by hardware virtualization instructions (if the host processor supports x86 virtualization, e.g., Intel VT-x and AMD-V), or paravirtualized operating systems whereby the operating system is aware that it is running inside a virtual machine, and so makes hypercalls directly, rather than issuing privileged instructions.
 Xen Project boots from a bootloader such as GNU GRUB, and then usually loads a paravirtualized host operating system into the host domain (dom0).
 
-Uses: [Where it’s valuable and a good fit]
+Uses: 
+
+[Where it’s valuable and a good fit]
+
 Barham et al. research paper, “Xen and the Art of Virtualization” confirms the initial hypothesis that Xen is a good fit when the resources are oversubscribed or the users are uncooperative. 
 Internet hosting service companies use hypervisors to provide virtual private servers. Amazon EC2 (since August 2006), IBM SoftLayer, Liquid Web, Fujitsu Global Cloud Platform, Linode, OrionVM and Rackspace Clouduse Xen as the primary VM hypervisor for their product offerings.
 Virtual machine monitors (also known as hypervisors) also often operate on mainframes and large servers running IBM, HP, and other systems. Server virtualization can provide benefits such as:
