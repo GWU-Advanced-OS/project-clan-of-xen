@@ -81,19 +81,23 @@ Compared to others on the market, Xen provides less management tools and you sho
 
 ## VEDANT
 
-Xen Project runs in a more privileged CPU state than any other software on the machine.
-Responsibilities of the hypervisor include memory management and CPU scheduling of all virtual machines ("domains"), and for launching the most privileged domain ("dom0") - the only virtual machine which by default has direct access to hardware. From the dom0 the hypervisor can be managed and unprivileged domains ("domU") can be launched.[3]
-The dom0 domain is typically a version of Linux or BSD. User domains may either be traditional operating systems, such as Microsoft Windows under which privileged instructions are provided by hardware virtualization instructions (if the host processor supports x86 virtualization, e.g., Intel VT-x and AMD-V),[4] or paravirtualized operating systems whereby the operating system is aware that it is running inside a virtual machine, and so makes hypercalls directly, rather than issuing privileged instructions.
-Xen Project boots from a bootloader such as GNU GRUB, and then usually loads a paravirtualized host operating system into the host domain (dom0).
+* Summarize the project, what it is, what its goals are, and why it exists.
 
-Internet hosting service companies use hypervisors to provide virtual private servers. Amazon EC2 (since August 2006),[48] IBM SoftLayer,[49] Liquid Web, Fujitsu Global Cloud Platform,[50] Linode, OrionVM[51] and Rackspace Cloud use Xen as the primary VM hypervisor for their product offerings.[52]
-Virtual machine monitors (also known as hypervisors) also often operate on mainframes and large servers running IBM, HP, and other systems.[citation needed] Server virtualization can provide benefits such as:
-Consolidation leading to increased utilization
-Rapid provisioning
-Dynamic fault tolerance against software failures (through rapid bootstrapping or rebooting)
-Hardware fault tolerance (through migration of a virtual machine to different hardware)
-Secure separations of virtual operating systems
-Support for legacy software as well as new OS instances on the same computer
-Xen's support for virtual machine live migration from one host to another allows load balancing and the avoidance of downtime.
-Virtualization also has benefits when working on development (including the development of operating systems): running the new system as a guest avoids the need to reboot the physical computer whenever a bug occurs. Sandboxed guest systems can also help in computer-security research, allowing study of the effects of some virus or worm without the possibility of compromising the host system.
-Finally, hardware appliance vendors may decide to ship their appliance running several guest systems, so as to be able to execute various pieces of software that require different operating systems.
+Xen provides a type-1 hypervisor, thus providing services to allow multiple operating systems to execute concurrently on the same computer hardware. It aims to minimize the overhead in implementing robust virtualization and make the whole experience of the VM as realistic as running the OS on an actual machine. It exists so that users can simultaneously use host and guest OSes on the same hardware. 
+
+* What is the target domain of the system? Where is it valuable, and where is it not a good fit? These are all implemented in an engineering domain, thus are the product of trade-offs. No system solves all problems (despite the claims of marketing material).
+
+Xen’s primary users are private companies such as Internet hosting services that provide virtual private servers, research firms that run various sandboxed guest systems, and hardware appliance vendors that need to ship their appliance running several guest systems. Xen is a good fit when resources are oversubscribed or users are uncooperative. However, Xen is not the best fit when it comes to running a small set of guest OSes which can simply be one by deploying one or more hosts running standard OSes that do not require much system administration and support for things like performance isolation, scheduling priority, memory demand, etc. 
+
+
+* What are the "modules" of the system (see early lectures), and how do they relate? Where are isolation boundaries present? How do the modules communicate with each other? What performance implications does this structure have?
+
+* The Xen Project Hypervisor is an exceptionally lean (<65KSLOC on Arm and <300KSLOC on x86) software layer that runs directly on the hardware and is responsible for managing CPU, memory, and interrupts. It is the first program running after the bootloader exits. The hypervisor itself has no knowledge of I/O functions such as networking and storage.
+* Guest Domains/Virtual Machines are virtualized environments, each running their own operating system and applications. The hypervisor supports several different virtualization modes, which are described in more detail below. Guest VMs are totally isolated from the hardware: in other words, they have no privilege to access hardware or I/O functionality. Thus, they are also called unprivileged domain (or DomU).
+* The Control Domain (or Domain 0) is a specialized Virtual Machine that has special privileges like the capability to access the hardware directly, handles all access to the system’s I/O functions and interacts with the other Virtual Machines. he Xen Project hypervisor is not usable without Domain 0, which is the first VM started by the system. In a standard set-up, Dom0 contains the following functions:
+    * System Services: such as XenStore/XenBus (XS) for managing settings, the Toolstack (TS) exposing a user interface to a Xen based system, Device Emulation (DE) which is based on QEMU in Xen based systems
+    * Native Device Drivers: Dom0 is the source of physical device drivers and thus native hardware support for a Xen system
+    * Virtual Device Drivers: Dom0 contains virtual device drivers (also called backends).
+    * Toolstack: allows a user to manage virtual machine creation, destruction, and configuration. The toolstack exposes an interface that is either driven by a command line console, by a graphical interface or by a cloud orchestration stack such as OpenStack or CloudStack. Note that several different toolstacks can be used with Xen
+* Xen Project-enabled operating systems: Domain 0 requires a Xen Project-enabled kernel. Paravirtualized guests require a PV-enabled guest. Linux distributions that are based on Linux kernels newer than Linux 3.0 are Xen Project-enabled and usually include packages that contain the hypervisor and Tools (the default Toolstack and Console). All but legacy Linux kernels older than Linux 2.6.24 are PV-enabled, capable of running PV guests.
+
