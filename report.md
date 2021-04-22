@@ -226,6 +226,7 @@ Xen uses round robin algorithm to process competing disk requests and then it's 
 
 ### Negatives
 - Xen's monolithic architecture is quite worrisome as it is vulnerable to security hacks, given the size of the Trusted Computing Base (TCB)
+- Xen is not always suited to modern Hypervisor tasks. With faster hardware, developers are beginning to take advantage of incredibly performant memory and clock speeds. Unless the end goal is to run many different VMs, admins can shoot themselves in the foot using Xen. Like all solutions to a problem, it is important to recognize that Xen has a time and a place. 
 
 ## Resources and Papers
 - [KVM vs Xen vs VMWare](https://www.serverwatch.com/server-news/hypervisor-face-off-kvm-vs-xen-vs-vmware/)
