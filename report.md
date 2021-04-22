@@ -265,4 +265,6 @@ Xen uses round robin algorithm to process competing disk requests and then it's 
     - Core abstractions and system modules research
     - Final report based on group research
 - Vedant
-    - Target domain (where it is and is not a good fit) and system modules research
+    - Target domain (where it is and is not a good fit), use cases, and system modules research
+    - Monitoring and finalizing presentation slides for group report
+    - Monitoring and managing team communication and progress
