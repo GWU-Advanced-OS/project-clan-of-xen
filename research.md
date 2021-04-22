@@ -141,12 +141,13 @@ Vedant
 What is the target domain of the system? Where is it valuable, and where is it not a good fit? These are all implemented in an engineering domain, thus are the product of trade-offs. No system solves all problems (despite the claims of marketing material).
 
 Xen Project runs in a more privileged CPU state than any other software on the machine.
-Responsibilities of the hypervisor include memory management and CPU scheduling of all virtual machines ("domains"), and for launching the most privileged domain ("dom0") - the only virtual machine which by default has direct access to hardware. From the dom0 the hypervisor can be managed and unprivileged domains ("domU") can be launched.[3]
+Responsibilities of the hypervisor include memory management and CPU scheduling of all virtual machines ("domains"), and for launching the most privileged domain ("dom0") - the only virtual machine which by default has direct access to hardware. From the dom0 the hypervisor can be managed and unprivileged domains ("domU") can be launched.
 The dom0 domain is typically a version of Linux or BSD. User domains may either be traditional operating systems, such as Microsoft Windows under which privileged instructions are provided by hardware virtualization instructions (if the host processor supports x86 virtualization, e.g., Intel VT-x and AMD-V), or paravirtualized operating systems whereby the operating system is aware that it is running inside a virtual machine, and so makes hypercalls directly, rather than issuing privileged instructions.
 Xen Project boots from a bootloader such as GNU GRUB, and then usually loads a paravirtualized host operating system into the host domain (dom0).
 
-Uses: [Where it’s valuable]
-Internet hosting service companies use hypervisors to provide virtual private servers. Amazon EC2 (since August 2006), IBM SoftLayer, Liquid Web, Fujitsu Global Cloud Platform, Linode, OrionVM and Rackspace Clouduse Xen as the primary VM hypervisor for their product offerings.[52]
+Uses: [Where it’s valuable and a good fit]
+Barham et al. research paper, “Xen and the Art of Virtualization” confirms the initial hypothesis that Xen is a good fit when the resources are oversubscribed or the users are uncooperative. 
+Internet hosting service companies use hypervisors to provide virtual private servers. Amazon EC2 (since August 2006), IBM SoftLayer, Liquid Web, Fujitsu Global Cloud Platform, Linode, OrionVM and Rackspace Clouduse Xen as the primary VM hypervisor for their product offerings.
 Virtual machine monitors (also known as hypervisors) also often operate on mainframes and large servers running IBM, HP, and other systems. Server virtualization can provide benefits such as:
 Consolidation leading to increased utilization
 Rapid provisioning
@@ -160,10 +161,14 @@ Finally, hardware appliance vendors may decide to ship their appliance running s
 
 [Where it’s not a good fit]
 
-Unfortunately, one of the most widely-used hypervisors, Xen is highly susceptible to attack because it employs a monolithic design (a single point of failure) and com- prises a complex set of growing functionality including VM management, scheduling, instruction emulation, IPC (event channels), and memory management. As Xen’s functionality has increased so too has its code base, rising from 45K lines-of-code (LoC) in v2.0 to 270K LoC in v4.0. Such a large code base inevitably leads to a large number of bugs that become security vulnerabilities. Attackers can easily exploit a known hypervisor vulnerability to “jail break” from a guest VM to the hypervisor to gain full control of the system. For example, a privilege escalation caused by non- canonical address handling (in a hypercall) can lead to an attacker gaining control of Xen, undermining all security in multi-tenant cloud environments.
-Research Paper: https://www.trustkernel.com/uploads/pubs/nx.pdf
-https://link.springer.com/content/pdf/10.1007/978-3-540-78474-6_23.pdf
-https://dl.acm.org/doi/pdf/10.1145/1346256.1346259?casa_token=EEidqpPOJ3QAAAAA:S4NWWNXZ8Lee6ZSrqWU6TPF9PFOJXHpI6Bgt3YoACALvtG_zo0on5A-XPGKEUJKNd1G99LUmPRPe2Q
+Xen might not be the best fit when it comes to running a small set of guest OSes which can simply be one by deploying one or more hosts running standard OSes that do not require much system administration. This hypothesis is confirmed by Shi et. al’s research titled “Deconstructing Xen”.
+Unfortunately, one of the most widely-used hypervisors, Xen is highly susceptible to attack because it employs a monolithic design (a single point of failure) and com- prises a complex set of growing functionality including VM management, scheduling, instruction emulation, IPC (event channels), and memory management. As Xen’s functionality has increased so too has its code base, rising from 45K lines-of-code (LoC) in v2.0 to 270K LoC in v4.0. Such a large code base inevitably leads to a large number of bugs that become security vulnerabilities. Attackers can easily exploit a known hypervisor vulnerability to “jail break” from a guest VM to the hypervisor to gain full control of the system. For example, a privilege escalation caused by non- canonical address handling (in a hypercall) can lead to an attacker gaining control of Xen, undermining all security in multi-tenant cloud environments. 
+
+References:
+- https://www.trustkernel.com/uploads/pubs/nx.pdf
+- https://link.springer.com/content/pdf/10.1007/978-3-540-78474-6_23.pdf
+- https://dl.acm.org/doi/pdf/10.1145/1346256.1346259?casa_token=EEidqpPOJ3QAAAAA:S4NWWNXZ8Lee6ZSrqWU6TPF9PFOJXHpI6Bgt3YoACALvtG_zo0on5A-XPGKEUJKNd1G99LUmPRPe2Q
+
 
 
 
