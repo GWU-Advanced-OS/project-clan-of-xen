@@ -5,6 +5,7 @@
 - research.md: Includes a dump of all the research done along with supporting files and resources
 - report.md: Final report
 - presentation: Includes relevant files for the presentation
+- images: Contains images used in research.md and report.md 
 
 ## Authors
 
