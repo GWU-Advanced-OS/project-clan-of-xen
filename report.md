@@ -32,7 +32,7 @@ Xen Project runs in a more privileged CPU state than any other software on the m
 * Furthermore, they found that more than half of the core vulnerabilities are located in the per-VM logic i.e. things like guest memory management, CPU virtualization, and instruction emulation.
 * Unfortunately, even though it is one of the most widely-used hypervisors, Xen is highly susceptible to attack because it employs a monolithic design (a single point of failure) and comprises a complex set of growing functionality including VM management, scheduling, instruction emulation, IPC (event channels), and memory management.
 * As Xen’s functionality has increased, so too has its code base, rising from 45K lines-of-code (LoC) in v2.0 to 270K LoC in v4.0. Such a large code base inevitably leads to a large number of bugs that become security vulnerabilities. Attackers can easily exploit a known hypervisor vulnerability to “jail break” from a guest VM to the hypervisor to gain full control of the system. For example, a privilege escalation caused by non-canonical address handling (in a hypercall) can lead to an attacker gaining control of Xen, undermining all security in multi-tenant cloud environments.
-
+* Xen is not a good fit for applications that require low latencies(networking, media applications)
 ## System Modules
 ![Xen Control Plane](https://www.researchgate.net/profile/Kamyab-Khajehei/publication/299480036/figure/fig2/AS:388513037078530@1469640134610/The-structure-of-machine-running-the-Xen-hypervisor-8.png)
 - The main characteristics of Xen is a dom0 (host/manager), which is default virtual machine, and other virtual machines (domU).
@@ -210,12 +210,40 @@ Xen. This allows each domain to trade-off latency and throughput requirements.
 - Network   
 Xen implements zero copy networking where it requires Guest OS to exchange unused page frame for each packet it receives to avoid copying the packet between Xen and guest OS.
 
-- Scheduler   
-Xen uses Borrowed Virtual Time scheduling algorithm. BVT provides low-latency dispatch by using virtual-time warping, a mechanism which temporarily violates ‘ideal’ fair sharing to favor recently-woken domains. 
+- Scheduler
+Xen allows for schedular optimizations to work best with the workload. By default the time slice preemption is set to 30 ms but that can be modified and set to much lower value by setting ```tslice_ms ``` but in case if there is a situation where there is heavy workload and context switches slows down the workflow then context switch can be rate limited as well.  Xen uses Credit scheduling algorithm. It's a weighted proportional fair share algorithm. Each physical cpu has a run queue for virtual cpu's that are placed on it based on their priority.
+The paper discussing the XenTune monitoring tool did make it obvious that choosing the right parameters can be difficult and for most users lead to worse performance just like the authors of the XenTune paper had to face.
 
-- Virtual address translation  
-Xen does not require the use of shadow page tables which is required in full virtualization.
-Xen maps guest OS page tables directly with the memory and then make it Read only. All page table updates are passed to Xen for validation via hypercall. A small optimization here exists where guest OS can queue multiple updates locally before making a hypercall. Because most of the times guest OS will be reading from page tables, it has very little performance overhead.   
+
+- Virtual address translation
+All hypervisors introduce an abstraction which acts as pseudo memory. This abstraction is P2M which translates guest page tables to machine page tables. In Full virtualization this P2M is managed inside hypervisor by something called shadow page tables. The problem with shadow page tables is that the hypervisor has to synchronize any changes that happen in the guest page table because the guest VM does not know about the existence of shadow page tables. This is slow.
+Xen provides a novel idea called Direct Paging which allows it to map virtual address directly to underlying machine address space and the virtual to physical mapping is directly managed by the guest VM. In order to make sure that guest VM
+does not make any rogue changes, all page table updates are passed to Xen for validation via hypercall. 
+
+The update hypercall code
+```
+ struct mmu_update {
+     uint64_t ptr;       /* Machine address of PTE. */
+     uint64_t val;       /* New contents of PTE.    */
+ };
+ 
+ long HYPERVISOR_mmu_update(const struct mmu_update reqs[],
+                            unsigned count, unsigned *done_out,
+                            unsigned foreigndom)
+
+```
+
+An additional optimization here exists as well where guest OS can queue multiple updates locally before making a hypercall. The code below describes how batching works. The hypercall is defined by the function HYPERVISOR_multicall which takes an array hypercalls.  
+```
+struct multicall_entry {
+     unsigned long op, result;
+     unsigned long args[6];
+ };
+ 
+ long HYPERVISOR_multicall(multicall_entry_t call_list[],
+                           unsigned int nr_calls);
+```
+
 
 - Disk  
 Reordering of requests happen at two places. Once inside the domain by the disk scheduling algorithm inside it before queueing them on the ring and the second time inside Xen as it has more knowledge about the actual disk layout. So responses from Xen can also be out of order as we have already mentioned above when discussing the ring data structure. Domains can also explicitly pass down reorder barriers to prevent reordering if order is necessary to maintain higher level semantics.
@@ -250,6 +278,7 @@ Xen uses round robin algorithm to process competing disk requests and then it's 
 - [Deconstructing Xen](https://www.trustkernel.com/uploads/pubs/nx.pdf)
 - [Virtual Cluster Management with Xen](https://link.springer.com/content/pdf/10.1007/978-3-540-78474-6_23.pdf)
 - [Inter-domain socket communications supporting high performance and full binary compatibility on Xen](https://dl.acm.org/doi/pdf/10.1145/1346256.1346259?casa_token=EEidqpPOJ3QAAAAA:S4NWWNXZ8Lee6ZSrqWU6TPF9PFOJXHpI6Bgt3YoACALvtG_zo0on5A-XPGKEUJKNd1G99LUmPRPe2Q)
+- [Selective Hardware/Software Memory Virtualization](research/Wang2011.pdf)
 
 ## Team Contributions
 - Aki
