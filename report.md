@@ -198,16 +198,16 @@ xen/tools/flask/policy/modules/xen.te
 ## Optimizations
 We can breakdown the optimizations in the system by components.
 
-- Event Channels
+- Event Channels  
 Events are how Xen notifies the VMs and event channel is a primitive provided by Xen for event notifications. Events are stored as bitmap which is shared between VMs and Xen. Optimizations such as N-Level search path and per-cpu mask are used to speed up the search process. So far Xen supports 2-level event channel and 3-level is planned for their latest 4.3 version.
 2-level event channel is where the first level is pending event bits which basically means what kind of event is pending and the second level is a bitset of pending events themselves.
 
-<img align="right" src="images/Screenshot%20(25).png">
 - Buffered IO Ring  
 Ring data structure is an implementation of queue data structure and uses pointers for Enqueue and Dequeue. In Xen, guest VMs attach a unique Id for each request that goes into the ring and Xen after processing the request reproduces the id when placing it on the ring for consumption by guest VMs. This optimization allows Xen to reorder requests in order of priority or scheduling
 considerations which is useful when dealing with disk requests.
 Another optimization that exists where Xen decouples the production of requests or responses from the notification of the other party. It is very similar to batching where a domain can defer delivery of a notification by specifying a threshold of number of responses or in the case of requests, a domain may enqueue multiple entries before invoking a hypercall to alert
-Xen. This allows each domain to trade-off latency and throughput requirements.
+Xen. This allows each domain to trade-off latency and throughput requirements.  
+![Buffered IO Ring](images/Screenshot%20(25).png)
 
 - Network   
 Xen implements zero copy networking where it requires Guest OS to exchange unused page frame for each packet it receives to avoid copying the packet between Xen and guest OS.
